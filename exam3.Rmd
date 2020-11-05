@@ -1,0 +1,70 @@
+---
+title: "Exam3"
+author: "Tianqi(Tim)"
+date: "11/4/2020"
+output: html_document
+---
+
+```{r}
+pigs <- read.csv("https://raw.githubusercontent.com/Kakashi-sensei/STAT_587_2020_fall_exam3/main/pigs.csv", header=TRUE)
+pigs$dose2 <- as.factor(pigs$dose)
+t1 <- aov(length~dose2, data = pigs)
+summary(t1)
+xbar <- mean(pigs$dose)
+coeff <- unique(pigs$dose) - xbar
+library(gmodels)
+fit.contrast(t1,"dose2",coeff)
+
+fit.contrast(t1, "dose2", c(-1, 0, 0, 0, 1))
+fit.contrast(t1, "dose2", c(1, -1/4, -1/4, -1/4, -1/4))
+
+fit.lm <- lm(data=pigs, length ~ dose)
+summary(fit.lm)
+plot(fit.lm$fitted, fit.lm$residuals, pch=20, xlab="Predicted", ylab="Residuals", main="Residual by Predicted Plot",abline(a=0, b=0))
+library(car)
+qqPlot(fit.lm$residuals, pch=20, xlab="Normal Quantiles", ylab="Residuals")
+confint(fit.lm)
+fit.sat <- lm(data=pigs, length ~ factor(dose))
+anova(fit.lm, fit.sat)
+pigs$dose3 <- 2*pigs$dose
+fit.lm3 <- lm(data=pigs, length ~ dose3)
+summary(fit.lm3)
+rm(list=ls())
+
+#q2
+0.88*sqrt(3.02/9.26)
+sqrt(3.02*(1-0.88*0.88)*44/43)
+qt(0.975, 43)
+0.834959*sqrt(1/45+68.74*68.74/(44*9.26))
+4.623+2.017*2.846
+4.623-2.017*2.846
+sqrt(3.02/45)
+```
+
+
+
+```{r}
+#Randomization test for Q1c
+pigs2 <- read.csv("https://raw.githubusercontent.com/Kakashi-sensei/STAT_587_2020_fall_exam3/main/pigs2.csv", header=TRUE)
+
+randomsamples <-function(y, trt, nsims=500){
+  n <- tapply(y, trt, length)
+  y_sims<-NULL
+  for(i in 1:nsims){
+    n_new <- sample(1:length(y), n[1])
+    y_sims <- rbind(y_sims, c(mean(y[n_new]), mean(y[!(1:length(y)) %in% n_new])))
+  }
+  y_sims<-as.data.frame(y_sims)
+  names(y_sims)<-names(n)
+  return(y_sims)
+}
+
+samples <- randomsamples(pigs2$length, pigs2$dose, nsims = 500)
+diff_random <- samples$`2`-samples$`0`
+
+m <- sum(diff_random >= 4.225)
+n <- length(diff_random)
+(m+1)/(n+1)
+t.test(ratmass~groups,alternative = 'greater’, data=ratdata)
+```
+
