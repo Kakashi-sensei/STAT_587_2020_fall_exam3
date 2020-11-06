@@ -84,8 +84,15 @@ oil <- read.table("https://raw.githubusercontent.com/Kakashi-sensei/STAT_587_202
 str(oil)
 fit.lm2 <- lm(data=oil, oil ~ variety*temp)
 summary(fit.lm2)
-
-
+#q4c
+library(car)
+Anova(fit.lm2)
+#q4d
+plot(fit.lm2$fitted, fit.lm2$residuals, pch=20, xlab="Predicted", ylab="Residuals", main="Residual by Predicted Plot",abline(a=0, b=0))
+#Q4e
+fit.lm <- lm(data=oil, oil ~ variety + temp)
+summary(fit.lm)
+rm(list=ls())
 ```
 
 
