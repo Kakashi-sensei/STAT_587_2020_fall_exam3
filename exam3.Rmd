@@ -39,6 +39,53 @@ qt(0.975, 43)
 4.623+2.017*2.846
 4.623-2.017*2.846
 sqrt(3.02/45)
+
+#q3
+income <- read.csv("https://raw.githubusercontent.com/Kakashi-sensei/STAT_587_2020_fall_exam3/main/income.csv", header=TRUE)
+str(income)
+names(income)
+library(car)
+qqPlot(income$Income2005, pch=20)
+if (!require("glmulti")) install.packages("glmulti")
+library(glmulti)
+income$lnIncome2005 <- log(income$Income2005)
+qqPlot(income$lnIncome2005, pch=20,xlab="ln income")
+
+#q3c
+models <- glmulti(data=income,lnIncome2005 ~ Imagazine + Inewspaper + Ilibrary
+                  + MotherEd + FatherEd + Gender + Educ + FamilyIncome78 + Race, 
+                  crit="aicc", fitfunction="lm", level=1)
+st <- summary(models)
+st$bestic
+st$bestmodel
+fit.all <- lm(data=income, st$bestmodel)
+summary(fit.all)
+#q3d
+income2 <- income[,c(9,2,8,11,7,13)]
+pairs(income2[,-5])
+cor(income2[,-5])
+fit.lm <- lm(data=income2, lnIncome2005 ~ AFQT + Imagazine + Educ + FamilyIncome78 + Gender)
+library(car)
+vif(fit.lm)
+#q3e
+summary(fit.lm)
+fit.equal <- lm(data=income2, lnIncome2005 ~ 1)
+summary(fit.equal)
+anova(fit.equal, fit.lm)
+
+#q3h
+predict(fit.lm, newdata=data.frame(Educ=15, Imagazine=1, FamilyIncome78=25000, Gender = "female", AFQT = 58.404), interval="prediction")
+exp(10.25479)
+exp(8.556311)
+exp(11.95328)
+rm(list=ls())
+#q4
+oil <- read.table("https://raw.githubusercontent.com/Kakashi-sensei/STAT_587_2020_fall_exam3/main/oil.txt", header=TRUE)
+str(oil)
+fit.lm2 <- lm(data=oil, oil ~ variety*temp)
+summary(fit.lm2)
+
+
 ```
 
 
@@ -65,6 +112,6 @@ diff_random <- samples$`2`-samples$`0`
 m <- sum(diff_random >= 4.225)
 n <- length(diff_random)
 (m+1)/(n+1)
-t.test(ratmass~groups,alternative = 'greater’, data=ratdata)
+
 ```
 
